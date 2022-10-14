@@ -1,0 +1,52 @@
+﻿@model IEnumerable<IMS.Models.Models.Category>
+
+<div class="border p-3" style="margin-top:65px;">
+    <div class="row">
+        <div class="col-6">
+            <h2>Category List</h2>
+        </div>
+        <div class="col-6">
+            <a class="btn btn-primary" asp-action="Upsert">Add New Category</a>
+        </div>
+    </div>
+    <br />
+    <hr />
+    @if (Model.Count() > 0)
+    {
+        <table class="table table-responsive table-hover table-bordered table-striped table-dark" style="text-align:center;">
+            <thead>
+                <tr>
+                    <th scope="col">Serial No</th>
+                    <th scope="col">Category Name</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cat in Model)
+                {
+                    <tr>
+                        <td id="cat_serial_no"></td>
+                        <td>@cat.Category_Name</td>
+                        <td>
+                            <div class="row">
+                                <div class="col-6">
+                                    <a class="btn btn-secondary" asp-action="Upsert" asp-route-id="@cat.Category_Id">Edit</a>
+                                </div>
+                                <div class="col-6">
+                                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@cat.Category_Id">Delete</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No category added yet!</p>
+    }
+</div>
+
+
+<script src="/js/serialize_table.js"></script>

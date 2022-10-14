@@ -1,0 +1,79 @@
+﻿@model Microsoft.AspNetCore.Identity.IdentityRole
+
+<div class="border p-3" style="margin-top:65px;">
+    <div class="row">
+        <div class="col-6">
+            <h2>Role List</h2>
+        </div>
+        <div class="col-6">
+            <a class="btn btn-primary" asp-action="Upsert">Add New Role</a>
+        </div>
+    </div>
+    <br />
+    <hr />
+    <table id="role_table" class="table table-hover table-bordered table-striped" style="text-align:center;">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Normalize Name</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+<script src="~/js/get_Role_list.js"></script>
+
+<script type="text/javascript">
+    //Delete Role
+    function DeleteRole(id, e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+                $.ajax({
+                    url: "/Role/Delete/",
+                    type: "POST",
+                    data: {
+                        id : id,
+                    },
+                    success: function (res) {
+                        if(res.success == false){
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: "You can't Delete this role because it's already assigned!"
+                            });
+                        }
+                        else
+                        {
+                            Swal.fire({
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Role Deleted',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                            loadRoleList();
+                        }
+                    },
+                    error: function (err) {
+
+                    }
+                })
+            }
+        })
+    }
+</script>

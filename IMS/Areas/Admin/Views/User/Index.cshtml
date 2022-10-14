@@ -1,0 +1,229 @@
+﻿@model IMS.Models.ViewModels.UserVM
+
+<div id="userContainer">
+</div>
+
+
+@section Scripts{
+
+
+    <script>
+        $(document).ready(function () {
+            LoadUserTable();
+            Search_Role();
+        });
+
+        //userTable load
+        function LoadUserTable() {
+            $.ajax({
+                url: "/Admin/User/UserTable/",
+                type: "GET",
+                success: function (response) {
+                    $("#userContainer").html(response);
+                }
+            });
+        }
+
+        //Search Role
+        function Search_Role() {
+            var roleId = $("#s_role").val();
+            $.ajax({
+                type: 'GET',
+                url: '/Admin/User/UserTable/',
+                data: {
+                    id: roleId
+                },
+                success: function (data) {
+                    $("#userContainer").html(data);
+                    $("#s_role").val(roleId);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+                //async: true
+            });
+        }
+        //view edit modal
+        function EditUserView(roleId, e) {
+            e.preventDefault();
+            //var url = '/Admin/User/Edit/' + id;
+            $('#editUserModal').modal('show');
+            $.ajax({
+                url: '/Admin/User/Edit/',
+                type: "GET",
+                data:{
+                    id:roleId,
+                },
+                success: function (res) {
+                    $('#user_id').val(res.data.id);
+                    $('#user_name').val(res.data.full_Name);
+                    $('#user_role').val(res.data.roleId);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });//end ajax Call
+        }
+
+        //save entry
+        function SaveEditedUser(id, e) {
+            e.preventDefault();
+            var data = new FormData();
+            var formData = $('#save_user_from').serializeArray();
+            $.each(formData, function (key, input) {
+                data.append(input.name, input.value);
+            });
+            $.ajax({
+                url: "/Admin/User/Edit/",
+                type: "POST",
+                data: data,
+                processData: false,
+                cache: false,
+                contentType: false,
+                success: function (res) {
+                    if (res.success == true) {
+                        //load with new data
+                        //$.ajax({
+                        //    url: "User/UserTable/",
+                        //    type: "GET",
+                        //    success: function (response) {
+                        //        $("#userContainer").html(response);
+                        //        Swal.fire({
+                        //            position: 'top-end',
+                        //            icon: 'success',
+                        //            title: 'Role Updated!',
+                        //            showConfirmButton: false,
+                        //            timer: 1500
+                        //        });
+                        //    }
+                        //});
+                        LoadUserTable();
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Role Updated!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        $('#editUserModal').modal('hide');
+                    }
+                    else {
+                        $('#editUserModal').modal('hide');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Something went wrong!',
+                            footer: 'Please Refresh the page and try again!'
+                        });
+                    }
+                },
+                error: function (err) {
+
+                }
+            });//end ajax Call
+        }
+
+        //delete user
+        function DeleteUser(id, e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    //Swal.fire(
+                    //    'Deleted!',
+                    //    'Your file has been deleted.',
+                    //    'success'
+                    //)
+                    $.ajax({
+                        url: "/Admin/User/Delete/",
+                        type: "POST",
+                        data: {
+                            id : id,
+                        },
+                        success: function (res) {
+                            if (res.success == true) {
+                                LoadUserTable();
+                                Swal.fire({
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: 'User Deleted!',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                            }
+                            else {
+
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Something went wrong!',
+                                    footer: 'Please Refresh the page and try again!'
+                                });
+                            }
+                        },
+                        error: function (err) {
+
+                        }
+                    })
+                }
+            })
+        }
+
+        //BlockUnblock User
+        function BlockUnblock(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        //url: "/Admin/User/BlockUnblock/" + id,
+                        url: "/Admin/User/BlockUnblock/",
+                        type: "POST",
+                        data:{
+                            id : id,
+                        },
+                        success: function (response) {
+                            if (response.success == true) {
+
+                                Swal.fire({
+                                    position: 'top-end',
+                                    icon: 'error',
+                                    title: 'User Blocked!',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                            }
+                            else {
+                                Swal.fire({
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: 'User Unblocked!',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                            }
+                            //load with new data
+                            LoadUserTable();
+                        }
+                    });
+                }
+            })
+        }
+    </script>
+
+
+
+}

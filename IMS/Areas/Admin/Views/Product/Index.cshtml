@@ -1,0 +1,281 @@
+﻿@model IMS.Models.ViewModels.ProductVM
+ @*<input value="2022-02-22" type="date" pattern="\d{4}-\d{2}-\d{2}" min="2000-12-31" max="3022-12-31" />*@
+<div id="crProdModal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="createProductModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+       
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="upsertProductModal"></h4>
+                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" onclick="closeModal()">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex">
+                    <div class="container">
+                        <form method="post" asp-action="Upsert" id="createProd" enctype="multipart/form-data">
+                            <input id="pr_id" asp-for="Product.Product_Id" hidden class="form-control" />
+                            <div class="border p-3">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-group row">
+                                            <div class="col-4">
+                                                <label asp-for="Product.Product_Name"></label>
+                                            </div>
+                                            <div class="col-8">
+                                                <input id="pr_name" asp-for="Product.Product_Name" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row pt-2">
+                                            <div class="col-4">
+                                                <label asp-for="Product.Product_Description"></label>
+                                            </div>
+                                            <div class="col-8">
+                                                <input id="pr_desc" asp-for="Product.Product_Description" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row pt-2">
+                                            <div class="col-4">
+                                                <label asp-for="Product.Product_Price"></label>
+                                            </div>
+                                            <div class="col-8">
+                                                <input id="pr_price" asp-for="Product.Product_Price" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row pt-2">
+                                            <div class="col-4">
+                                                <label asp-for="Product.Quantity"></label>
+                                            </div>
+                                            <div class="col-8">
+                                                <input id="pr_price" asp-for="Product.Quantity" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row pt-2">
+                                            <div class="col-4">
+                                                <label asp-for="Product.inStock"></label>
+                                            </div>
+                                            <div class="col-8">
+                                                <input id="pr_price" asp-for="Product.inStock" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row pt-2">
+                                            <div class="col-4">
+                                                <label asp-for="Product.Parent_Cat_Id"></label>
+                                            </div>
+                                            <div class="col-8">
+                                                <select id="category_Val" asp-for="Product.Parent_Cat_Id" asp-items="@Model.CategorySelectList" class="form-control">
+                                                    <option disabled selected>--Select Category--</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row pt-2">
+                                            <div class="col-4">
+                                                <label asp-for="Product.Parent_brand_Id"></label>
+                                            </div>
+                                            <div class="col-8">
+                                                <select id="brand_Val" asp-for="Product.Parent_brand_Id" asp-items="@Model.BrandSelectList" class="form-control">
+                                                    <option disabled selected>--Select Brand--</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row pt-2">
+                                            <div class="col-4">
+                                                <label>Upload Photos</label>
+                                            </div>
+                                            <div class="col-8">
+                                                <input type="file" name="up_files" accept="image/png, image/gif, image/jpeg" id="prod_img" multiple class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row pt-2">
+                                            <div class="col-8 offset-4 row">
+                                                <div class="col-4">
+                                                    <button id="upsert_btn" type="button" onclick="saveProduct('prod_img')" class="btn btn-info"></button>
+                                                </div>
+                                                <div class="col-4" style="padding-left: 35px;">
+                                                    <button type="button" class="btn btn-success" onclick="closeModal()">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="mt-2" id="p_contain_img" style="margin-right: 100px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="border p-3" style="margin-top:65px;">
+    <div class="row">
+        <div class="col-6">
+            <h2>Product List</h2>
+        </div>
+        <div class="col-6">
+            <a class="btn btn-primary" asp-action="Upsert" onclick="upsertModal(null,event)">Add New Product</a>
+        </div>
+    </div>
+    <br />
+    <hr />
+    <table id="product_table" class="table table-hover table-bordered table-striped" style="text-align:center;">
+        <thead>
+            <tr>
+                <th scope="col">Category</th>
+                <th scope="col">Brand</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Price</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">In Stock</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+
+
+<script src="/js/get_Product_list.js"></script>
+
+<script>
+    //$(document).ready(function() {
+    //    $('#category_Val').select2({
+    //        dropdownParent: $('#crProdModal')
+    //    });
+    //    $('#brand_Val').select2({
+    //        dropdownParent: $('#crProdModal')
+    //    });
+    //});
+
+    function upsertModal(id, e) {
+        e.preventDefault();
+        var url;
+        var data;
+        if (id == null) {
+            url = "/Admin/Product/Upsert";
+            data = null;
+        }
+        else {
+            url = "/Admin/Product/Upsert/";
+            data = id;
+        }
+        $.ajax({
+            url: url,
+            type: "GET",
+            data:{
+                id : data,
+            },
+            success: function(response) {
+                if (response.data.hasOwnProperty('brandSelectList')) {
+                    $('#upsertProductModal').html('Create Product');
+                    $('#upsert_btn').html('Create');
+                    $('#crProdModal').modal('show');
+                }
+                else {
+                    $('#upsertProductModal').html('Edit Product');
+                    $('#pr_id').val(response.data.product_Id);
+                    $('#pr_name').val(response.data.product_Name);
+                    $('#pr_desc').val(response.data.product_Description);
+                    $('#pr_price').val(response.data.product_Price);
+                    //$('#Product_Parent_Cat_Id option[value='+response.data.parent_Cat_Id.toUpperCase()+']').attr('selected','selected');
+                    //$('#Product_Parent_brand_Id option[value='+response.data.parent_brand_Id.toUpperCase()+']').attr('selected','selected');
+                    $('#category_Val').val('' + response.cateVal + '');
+                    $('#brand_Val').val('' + response.brandVal + '');
+                    $('#upsert_btn').html('Update');
+                    $('#crProdModal').modal('show');
+                    if(response.img_list.length > 0){
+                        for (var i = 0; i < response.img_list.length;i++){
+                            $('#p_contain_img').append('<img src="/images/product/'+response.img_list[i]+'" style="width:100px; height:100px;" />')
+                        }
+                    }
+                    else{
+                        $('#p_contain_img').html('');
+                    }
+                    
+                }
+
+            },
+            error: function(err) {
+
+            }
+        });
+    };
+    function saveProduct(p_img) {
+        //e.preventDefault();
+        var up_prod_img = document.getElementById(p_img);
+        var files = up_prod_img.files;
+        var data = new FormData();
+        var formData = $('#createProd').serializeArray();
+        $.each(formData, function(key, input) {
+            data.append(input.name, input.value);
+        });
+        for (var i = 0; i <= files.length; i++) {
+            data.append("up_img", files[i]);
+        }
+        $.ajax({
+            url: "/Admin/Product/Upsert",
+            type: "POST",
+            data: data,
+            processData: false,
+            cache: false,
+            contentType: false,
+            success: function(response) {
+                closeModal();
+                loadProductList();
+            },
+            error: function(err) {
+
+            }
+        });
+    }
+
+    function DeleteProduct(id, e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+                $.ajax({
+                    url: "/Admin/Product/Delete/",
+                    type: "POST",
+                    data: {
+                        id : id,
+                    },
+                    success: function(res) {
+                        loadProductList();
+                    },
+                    error: function(err) {
+
+                    }
+                })
+            }
+        })
+    }
+
+    function closeModal() {
+        $('#crProdModal').modal('hide');
+        $('#pr_name').val('');
+        $('#pr_desc').val('');
+        $('#pr_price').val('');
+        $('#category_Val').val('--Select Category--');
+        $('#brand_Val').val('--Select Brand--');
+        //$('#pr_id').val('');
+        $('#p_contain_img').html('')
+    };
+
+
+
+</script>

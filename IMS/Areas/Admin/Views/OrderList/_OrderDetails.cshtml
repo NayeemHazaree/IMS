@@ -1,0 +1,23 @@
+﻿@model IMS.Models.Models.OrderList
+
+<div class="row mt-2">
+    <div class="col-md-10">
+        <strong>Select Quantity</strong>
+        <input asp-for="Quantity" class="form-control" onchange="openAddBtn()" id="qty" type="number" />
+
+    </div>
+    <div class="col-md-2">
+        <i id="addDt" class="fa-solid fa-circle-plus text-primary" onclick="OrderSession()" style="margin-top: 30px;font-size: 30px;cursor:pointer;display: none;"></i>
+    </div>
+</div>
+<button id="save_Order" class="btn btn-primary mt-2" style="display:none;" disabled asp-action="SendRequest">Send Request</button>
+
+@*@{
+    Html.BeginForm("SendRequest", "OrderList", FormMethod.Post);
+    {
+        <div>
+            <input type="submit" id="save_Order" class="btn btn-primary mt-2" value="Send Request" disabled style="display:none;" />
+        </div>
+    }
+    Html.EndForm();
+}*@

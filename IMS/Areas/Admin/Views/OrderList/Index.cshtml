@@ -1,0 +1,201 @@
+﻿@model IMS.Models.Models.OrderList
+@using IMS.Models.Models
+@using IMS.Utility
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+
+<!-- Modal -> purchase history -->
+<div id="purchaseDate">
+
+</div>
+
+<!--View-->
+<div class="container border p-3" style="margin-top:65px;">
+    <div class="row">
+        <div class="col-12 p-3">
+            <h2 class="text-primary text-center">Order Products From Your Supplier</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <strong>Select Date to see the previous history</strong>
+        </div>
+        <div class="col-md-3">
+            <input type="date" class="form-control" id="s_date_order" />
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-primary form-control" onclick="previousHistory()">Search</button>
+        </div>
+    </div>
+    <hr />
+
+    <form method="post">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-5">
+                    <strong>Select Store</strong>
+                    <select id="select_store" onchange="openProd()" asp-for="StoreId" asp-items="@Model.Stores" class="form-control">
+                        <option disabled selected>--Select Store--</option>
+                    </select>
+                    <br />
+                    <strong>Select Product</strong>
+                    <select id="select_prod" disabled asp-for="ProductId" asp-items="@Model.Products" onchange="orderProduct()" class="form-control">
+                        <option disabled selected>--Select Product--</option>
+                    </select>
+                    <div id="orderView">
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div id="orderSession">
+                        <p id="totalItems"></p>
+                        <strong id="selected_items" style="display:none;">Selected Item(s):</strong>
+                    </div>
+                    <table class="table table-striped table-bordered table-hover" style="display: none;">
+                        <thead>
+                            <tr class="text-center">
+                                <th scope="col">Product Name</th>
+                                <th scope="col">Unit Price</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="Temp_Prod_DT">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+@section Scripts{
+    <script type="text/JavaScript">
+
+
+        function previousHistory(){
+            var s_date = $('#s_date_order').val();
+            $.ajax({
+                url:"/Admin/OrderList/PurchaseHistory",
+                type:"POST",
+                data: {
+                    OrderDate : s_date,
+                },
+                success:function(res){
+                    //console.log(res);
+                    $('#purchaseDate').html(res);
+                    $('#orderHistory').modal('show');
+                },
+                error:function(err){
+                    console.log(err);
+                }
+            })
+        }
+
+        //get the quantity input field from partial view
+        function orderProduct() {
+            $.ajax({
+                url: "/Admin/OrderList/GetOrderQty",
+                type: "GET",
+                success: function (res) {
+                    $("#orderView").html(res);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            })
+        }
+
+        //set the order list into session
+        function OrderSession() {
+
+            var storeID = $('#select_store').val();
+            var prodID = $('#select_prod').val();
+            var tempQty = $('#qty').val();
+            if (storeID != null && prodID != null && tempQty != null) {
+                $('#save_Order').attr('disabled', false);
+                $.ajax({
+                    url: "/Admin/OrderList/SaveOrder",
+                    type: "POST",
+                    data: {
+                        storeId: storeID,
+                        prodId: prodID,
+                        qty: tempQty,
+                    },
+                    success: function (res) {
+                        $('#totalItems').html("Total Items number : " + res.countObj);
+                        $('#Temp_Prod_DT').html('');
+                        $('.table').css("display", "block");
+                        $('#selected_items').css("display", "block");
+                        $('#temp_prodDT').css("display", "block");
+                        for (var i = 0; i < res.data.length; i++) {
+                            var newElement = document.createElement('tr');
+                            newElement.classList.add("text-center");
+
+                            //check if the name has space or not
+                            if (res.data[i].product_Name.indexOf(' ') >= 0) {
+                                res.data[i].product_Name = res.data[i].product_Name.split(' ').join('_');
+                            }
+
+                            //add table row data
+                            var total_price = res.data[i].product_Price * res.data[i].tempQty;
+                            newElement.innerHTML = "<th scope='row' id='p_Name'>" + res.data[i].product_Name + "</th><td id='u_Price'>" + res.data[i].product_Price + "</td><td id='p_qty'>" + res.data[i].tempQty + "</td><td id='am_total'>" + total_price + "</td>";
+                            document.getElementById("Temp_Prod_DT").appendChild(newElement);
+                        }
+                        $('#select_prod').val('--Select Product--');
+                        $('#qty').val(0);
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                })
+            }
+            else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Some fields value are missing!'
+                });
+            }
+        }
+
+        //submit the data and save in the DB
+        //function sendRequest() {
+        //    $('#select_store').attr('disabled', false);
+        //    $.ajax({
+        //        url: "/Admin/OrderList/SendRequest",
+        //        type: "POST",
+        //    })
+        //}
+
+        //products dropdownlist open
+        function openProd() {
+            $('#select_prod').attr('disabled', false);
+            $('#select_store').attr('disabled', true);
+        }
+
+        //enable add buttons to add items into session
+        function openAddBtn() {
+            if ($('#qty').val() > 0) {
+                $('#addDt').css('display', 'block');
+                $('#save_Order').css('display', 'block');
+            }
+            else {
+                $('#addDt').css('display', 'none');
+                $('#save_Order').css('display', 'none');
+            }
+        }
+
+        function createNewElement() {
+            // First create a DIV element.
+            var txtNewInputBox = document.createElement('div');
+
+            // Then add the content (a new input box) of the element.
+            txtNewInputBox.innerHTML = "<input type='text' id='newInputBox'>";
+
+            // Finally put it where it is supposed to appear.
+            document.getElementById("newElementId").appendChild(txtNewInputBox);
+        }
+    </script>
+    }

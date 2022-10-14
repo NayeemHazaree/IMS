@@ -1,0 +1,65 @@
+﻿@model IMS.Models.Models.CouponCodes
+
+@{
+    var title = "Add Coupon";
+}
+
+<form method="post" asp-action="Upsert">
+    @if (Model.Coupon_Id != Guid.Empty)
+    {
+        title = "Edit Coupon";
+        <input asp-for="Coupon_Id" hidden />
+    }
+
+    <div class="border p-3" style="margin-top:65px;">
+        <div class="row form-group">
+            <h2 class="text-info">@title</h2>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-8">
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="CouponCode"></label>
+                    </div>
+                    <div class="col-8">
+                        <input asp-for="CouponCode" class="form-control" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="form-group row mt-2">
+                    <div class="col-4">
+                        <label asp-for="CouponParcentange"></label>
+                    </div>
+                    <div class="col-8">
+                        <input asp-for="CouponParcentange" class="form-control" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="form-group row mt-2">
+                    <div class="col-4">
+                        <label asp-for="CouponDate"></label>
+                    </div>
+                    <div class="col-8">
+                        <input type="date" asp-for="CouponDate" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group row pt-2">
+                    <div class="col-8 offset-4 row">
+                        <div class="col-4">
+                            @if (Model.Coupon_Id == Guid.Empty)
+                            {
+                                <input type="submit" class="btn btn-info w-100" value="Create" />
+                            }
+                            else
+                            {
+                                <input type="submit" class="btn btn-info w-100" value="Update" />
+                            }
+                        </div>
+                        <div class="col-4">
+                            <a asp-action="Index" class="btn btn-success w-100">Back</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

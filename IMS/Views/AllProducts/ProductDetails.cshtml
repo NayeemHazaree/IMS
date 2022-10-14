@@ -1,0 +1,122 @@
+﻿@using IMS.Utility
+@model IMS.Models.ViewModels.ProductDetailsVM
+
+<div class="col-md-12" style="margin-top:65px;">
+    <form method="post">
+        <div class="row">
+            <div id="carouselExampleControls" class="carousel slide col-md-4" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    @{
+                        var i = 0;
+                    }
+                    @foreach (var img in Model.imgList)
+                    {
+                        i++;
+                        var active = i == 1 ? "active" : "";
+                        <div class="carousel-item @active">
+                            <img class="d-block w-100" src="@WC.p_image_path@img" alt="@img" style="height:200px">
+                            
+                        </div>
+                    }
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true" style="margin-top: -100px;"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true" style="margin-top: -100px;"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+                <br />
+                <div>
+                    <h5>@Model.Product.Product_Name</h5>
+                </div>
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Quantity: </strong>
+                        </div>
+                        <div class="col-md-6">
+                            @Model.Product.Quantity
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>In Stock: </strong>
+                        </div>
+                        <div class="col-md-6">
+                            @if (Model.Product.inStock == true)
+                            {
+                                <p style="color: green;">Yes</p>
+                            }
+                            else
+                            {
+                                <p style="color: red;">No</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-uppercase">
+                    <strong>Product Details</strong>
+                </div>
+                <hr />
+                <div class="text-decoration-underline">
+                    <strong>Description:</strong>
+                </div>
+                <div style="font-style: oblique;">
+                    @Model.Product.Product_Description
+                </div>
+                <br />
+
+            </div>
+            <div class="col-md-4">
+                <div class="card" style="background-color:yellow;border-radius: 30px;">
+                    <div class="card-body">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Price: </strong>
+                                </div>
+                                <div class="col-md-6">
+                                    @Model.Product.Product_Price
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Qty: </strong>
+                                </div>
+                                <div class="col-md-6">
+                                    <input asp-for="Quantity" autocomplete="off" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <div class="row">
+                                <div class="col-md-7">
+                                    @if(Model.ExistInCart)
+                                    {
+                                        <button class="btn btn-success" asp-action="RemoveFromCart" asp-route-id="@Model.Product.Product_Id">Remove from cart</button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-success" asp-action="AddToCart" asp-route-id="@Model.Product.Product_Id">Add to cart</button>
+                                    }
+                                </div>
+                                <div class="col-md-5">
+                                    <a class="btn btn-primary" asp-action="Index">Back to List</a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

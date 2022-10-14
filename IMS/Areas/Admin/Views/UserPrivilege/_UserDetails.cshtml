@@ -1,0 +1,81 @@
+﻿@model IMS.Models.Models.MenuList
+
+<br />
+<div id="user_info">
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-3">
+                Will show images here in a card
+            </div>
+            <div class="col-md-9">
+                @if (Model.ApplicationUser != null)
+                {
+                    <div class="col-lg-8">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <p class="mb-0">Full Name</p>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <p class="text-muted mb-0">@Model.ApplicationUser.Full_Name</p>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <p class="mb-0">Email</p>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <p class="text-muted mb-0">@Model.ApplicationUser.Email</p>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <p class="mb-0">Phone</p>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <p class="text-muted mb-0">@Model.ApplicationUser.PhoneNumber</p>
+                                    </div>
+                                </div>
+                                <hr>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <h5>Set Permissions</h5>
+    <input hidden type="text" id="userMenuList" class="form-control" />
+    @if (Model.PageList != null)
+    {
+        @foreach (var pageItem in Model.PageList)
+        {
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-1">
+                        @if (@pageItem.Status == true)
+                        {
+                            <input class="checkedMenu" checked id="@pageItem.Menu_Id" type="checkbox" onchange="SelectedMenuId(this.id)" />
+                        }
+                        else
+                        {
+                            <input id="@pageItem.Menu_Id" type="checkbox" onchange="SelectedMenuId(this.id)" />
+                        }
+                    </div>
+                    <div class="col-md-11">
+                        @pageItem.Controller_Name
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+    <button class="btn btn-primary" onclick="SaveUserPrivilege()">
+        Submit
+    </button>
+</div>

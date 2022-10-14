@@ -1,0 +1,129 @@
+﻿@model Microsoft.AspNetCore.Identity.IdentityRole
+
+@{
+    ViewData["Title"] = "Upsert";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+@{
+    var title = "Add Role";
+}
+
+<div class="container border" id="main-container" style="margin-top:65px;">
+    <form method="post">
+        <div class="row">
+            <div class="col-12">
+
+                @if (Model != null && !String.IsNullOrEmpty(Model.Id))
+                {
+                    title = "Edit Role";
+                    <input asp-for="Id" hidden />
+                }
+
+                <h3 class="text-primary">@title</h3>
+            </div>
+
+            <div class="col-md-10 col-lg-8 col-sm-12  pt-4">
+
+                @if (Model != null && !String.IsNullOrEmpty(Model.Id))
+                {
+                    <div class="row form-group my-3" style="display:none;">
+                        <div class="col-3">
+                            <label>Role Id</label>
+                        </div>
+                        <div class="col-8">
+                            <input class="form-control" asp-for="Id" readonly autocomplete="off" />
+                            <span asp-validation-for="Id" class="text-danger"></span>
+
+                        </div>
+                    </div>
+
+                }
+
+
+                <div class="row form-group my-3">
+                    <div class="col-3">
+                        <label>Role Name</label>
+                    </div>
+                    <div class="col-8">
+                        <input id="roleName" class="form-control" asp-for="Name" id="name" autocomplete="off" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                        <label id="name-span" class="text-danger"></label>
+                    </div>
+                </div>
+
+
+                <div class="row form-group offset-3 my-3">
+                    <div class="col-6">
+                        @if (Model != null && !String.IsNullOrEmpty(Model.Id))
+                        {
+                            <input type="submit" value="Update" id="submitBtn" class="form-control btn btn-success" />
+                        }
+                        else
+                        {
+                            <input type="submit" value="Submit" id="submitBtn" class="form-control btn btn-success" />
+                        }
+                    </div>
+                    <div class="col-6">
+                        <a class="form-control btn btn-primary" asp-action="Index"><i class="fas fa-arrow-left"></i> Back to List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            RoleExistsorNot();
+        });//End document ready function
+
+        //Role Name Available or not Check
+        function RoleExistsorNot() {
+            $('#roleName').keyup(function () {
+                var alphabaticString = new RegExp("^[a-zA-Z ]+$");
+                var RoleName = $("#roleName").val();
+                if (this.value[0] != this.value[0].toUpperCase()) {
+                    RoleName = this.value[0].toUpperCase();
+                    $("#roleName").val(RoleName);
+                }
+                $.ajax({
+                    url: '@Url.Action("RoleExists", "Role")',
+                    type: "GET",
+                    data: {
+                        name: RoleName
+                    },
+                    success: function (data) {
+                        if (data.success == true) {
+                            if (alphabaticString.test(RoleName)) {
+                                $("#name-span").text("Role Name Available");
+                                $("#name-span").removeClass("text-danger");
+                                $("#name-span").addClass("text-success");
+                                $("#submitBtn").attr("disabled", false);
+                            }
+                            else {
+                                $("#name-span").text("Role Name Must be Alphabetical");
+                                $("#name-span").removeClass("text-success");
+                                $("#name-span").addClass("text-danger");
+                                $("#submitBtn").attr("disabled", true);
+                            }
+                        }
+                        else {
+                            $("#name-span").text("Role Name is not Available");
+                            $("#name-span").removeClass("text-success");
+                            $("#name-span").addClass("text-danger");
+                            $("#submitBtn").attr("disabled", true);
+                        }
+                    }
+                });//End Ajax call
+            });//End keyup function
+        }
+    </script>
+}
+
+

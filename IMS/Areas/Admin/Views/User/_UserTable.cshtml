@@ -1,0 +1,142 @@
+﻿@model IMS.Models.ViewModels.UserVM
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="UserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="UserModalLabel">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="save_user_from">
+                <div class="modal-body">
+                    <div class="form-floating">
+                        <input asp-for="applicationUser.Id" hidden id="user_id" class="form-control" />
+                        <label>User Id</label>
+                    </div>
+                    <div class="form-floating">
+                        <input asp-for="applicationUser.Full_Name" disabled id="user_name" class="form-control" autocomplete="username" aria-required="true" />
+                        <label>User Name</label>
+                    </div>
+                    @* <div class="form-floating">
+
+                    </div>*@
+                    <select class="form-select" multiple aria-label="multiple select example" id="user_role" asp-for="applicationUser.RoleList" asp-items="@Model.RoleForUser">
+                        <option disabled selected style="text-align:center;">----Assign Role----</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="SaveEditedUser($('#user_id').val(),event)">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="border p-3" style="margin-top:5px;">
+    <div class="row">
+        <div class="col-6">
+            <h2>User List</h2>
+        </div>
+    </div>
+    <br />
+    <hr />
+    <div class="row" style="float:right;width: 30%;padding-right: 12px;">
+        <i class="fa-solid fa-arrow-up-wide-short" style="position: fixed;margin-left: -35px;margin-top: 10px;width: 10px;"></i>
+        @if(@Model.RoleForUser != null)
+        {
+            
+            <select id="s_role" asp-for="applicationUser.S_Role" onchange="Search_Role()" asp-items="@Model.RoleForUser" class="form-control">
+                <option value="all">All</option>
+            </select>
+        }
+       
+    </div>
+    @if (Model.ApplicationUsers != null)
+    {
+        <table id="user_table" class="table table-hover table-bordered table-striped" style="text-align:center;">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Phone Number</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model.ApplicationUsers)
+                {
+                    <tr>
+                        <td>@user.Full_Name</td>
+                        <td>@user.Email</td>
+                        <td>@user.PhoneNumber</td>
+                        <td>
+                            @{
+                                var roles = user.Role.Count();
+                                var count = 0;
+                            }
+                            @foreach (var role in user.Role)
+                            {
+                                if (roles > 1 && roles - 1 != count)
+                                {
+                                    @role <span>&#44;</span>
+                                    count++;
+                                }
+                                else
+                                {
+                                    @role
+                                }
+
+                            }
+                        </td>
+                        <td>
+                            @if (user.Id == Model.CurrentUser.Id)
+                            {
+                                <div class="row" style="cursor: not-allowed;">
+                                    <div class="col-4">
+                                        <a class="btn btn-dark disabled">Block</a>
+                                    </div>
+                                    <div class="col-4">
+                                        <a class="btn btn-info disabled" id="@user.Id">Edit</a>
+                                    </div>
+                                    <div class="col-4">
+                                        <a class="btn btn-danger disabled" id="@user.Id">Delete</a>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="row">
+                                    <div class="col-4">
+                                        @if(user.LockoutEnd == null){
+                                            <a class="btn btn-dark" id="@user.Id" onclick="BlockUnblock(this.id)">Block</a>
+                                        }
+                                        else{
+                                            <a class="btn btn-success" id="@user.Id" onclick="BlockUnblock(this.id)">Unblock</a>
+                                        }
+                                        
+                                    </div>
+                                    <div class="col-4">
+                                        <a class="btn btn-info" id="@user.Id" onclick="EditUserView(this.id,event)">Edit</a>
+                                    </div>
+                                    <div class="col-4">
+                                        <a class="btn btn-danger" id="@user.Id" onclick="DeleteUser(this.id,event)">Delete</a>
+                                    </div>
+                                </div>
+                            }
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No Useres Right now!</p>
+    }
+</div>

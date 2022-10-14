@@ -1,0 +1,96 @@
+﻿@model IMS.Models.Models.RolePrivilege
+
+<div class="container border p-3" style="margin-top:65px;">
+    <div class="row">
+        <div class="col-12 p-3">
+            <h2 class="text-primary text-center">Role Privilege</h2>
+        </div>
+    </div>
+
+    <select id="set_permission" onchange="getPageList()" asp-for="Set_Permission_Role_Id" asp-items="@Model.RoleListFromDb" class="form-control">
+        <option disabled selected>--Select Role--</option>
+    </select>
+    <div id="page_list_section">
+        
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+
+        function getPageList(){
+            var id = $("#set_permission").val();
+            $.ajax({
+                url: "/Admin/RolePrivilege/GetPageList/",
+                type: "GET",
+                data:{
+                    id : id,
+                },
+                success: function (response) {
+                    $("#page_list_section").html(response);
+                    var input_field = document.getElementsByClassName('checkedMenu');
+                    menulist = [];
+                    for(var i=0;i<input_field.length;i++){
+                        var selected_menu = input_field[i].id;
+                        menulist.push(selected_menu);
+                    }
+                    $('#roleMenuList').val(menulist);
+                },
+                error: function(err){
+                    console.log(err);
+                }
+            });
+        }
+
+        menulist = [];
+        function SelectedMenuId(menuId){
+            if (menulist.includes(menuId)){
+                //find the exist number and remove
+                menulist = menulist.filter(function (item) {
+                    return item !== menuId
+                });
+            }
+            else{
+                menulist.push(menuId);
+            }
+            
+            $('#roleMenuList').val(menulist);
+        }
+
+        function SaveRolePrivilege(){
+            var roleId = $("#set_permission").val();
+            var menuList_Id = $('#roleMenuList').val();
+
+            $.ajax({
+                url: "/Admin/RolePrivilege/AddRolePrivilege",
+                type:"POST",
+                data:{
+                    roleId : roleId,
+                    menuList_Id : menuList_Id,
+                },
+                success:function(res){
+                    if(res.success==true){
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Permissions Changed!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                    else{
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: "Something went wrong! Try again."
+                        });
+                    }
+                },
+                error:function(err){
+                    console.log(err);
+                }
+            });
+        }
+
+    </script>
+}

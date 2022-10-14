@@ -1,0 +1,63 @@
+﻿@model IEnumerable<IMS.Models.Models.OrderList>
+
+
+@if (Model.Count() > 0)
+{
+    <div class="modal fade modal-lg modal-dialog-scrollable show" id="orderHistory" tabindex="-1" aria-labelledby="orderHistoryLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderHistoryLabel">Purchase History</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-responsive table-hover table-bordered table-striped" style="text-align:center;">
+                        <thead>
+                            <tr>
+                                <th scope="col">Order Date</th>
+                                <th scope="col">Store Name</th>
+                                <th scope="col">Product Name</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col">Responsible Person</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var items in Model)
+                            {
+                                <tr>
+                                    <td>@items.OrderDate</td>
+                                    <td>@items.Store_Name</td>
+                                    <td>@items.Product_Name</td>
+                                    <td>@items.Quantity</td>
+                                    <td>@items.Responsible_Persone_Name</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="modal fade" id="orderHistory" tabindex="-1" aria-labelledby="orderHistoryLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderHistoryLabel">Purchase History</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <strong class="text-danger ">No history found</strong>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

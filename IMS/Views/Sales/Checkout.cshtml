@@ -1,0 +1,140 @@
+﻿@model IMS.Models.ViewModels.SaleInvoiceVM
+
+@*@{
+	Layout = null;
+}
+*@
+<link rel="stylesheet" href="~/css/Invoice_UI.css" asp-append-version="true" />
+
+<style>
+
+	#invoice_report td, #customers th {
+		border: 1px solid #ddd;
+		padding: 8px;
+	}
+
+	#invoice_report tr:nth-child(even) {
+		background-color: #f2f2f2;
+	}
+
+	#invoice_report tr:hover {
+		background-color: #ddd;
+	}
+		tr:nth-child(even) {
+		background-color: #f2f2f2;
+	}
+</style>
+
+<div id="cus_invoice_report" style="width: 55%;margin-bottom: 10% !important;margin: auto;">
+	<div style="display: inline-block;width: 45%;background-color: lightslategray;text-align: center;">
+		<span style="font-size: 1rem;font-family: cursive;">IMS Teams</span>
+	</div>
+	<div style="display: inline-block;float: right;width: 45%;background-color: #0DCAF0;text-align: center;	">
+		<span style="font-size: 1rem;font-family: cursive;">Invoice</span>
+	</div>
+	<div style="display: inline-block;width: 45%;">
+		<span>Bangladesh</span> <br>
+		<span>(+880)12345678</span><br>
+		<span>owner@ims.com</span>
+	</div>
+	<div style="display: inline-block;width: 45%;float: right;margin-top: 20px;">
+	    <span>Date: </span>
+	    <span style="float: right;">01-10-2022</span>
+	</div>
+	<br>
+	<br>
+	<div style="background-color: #0DCAF0;text-align: center;font-family: cursive;">
+		User Information
+	</div>
+	<div style="width:100%;display: flex;">
+		<div style="width: 25%;flex: 0 0 auto;font-family: serif;">
+			<span>Customer Name:</span>
+		</div>
+		<div style="width: 25%;flex: 0 0 auto;font-family: serif;">
+			<span>@Model.ApplicationUser.Full_Name</span>
+		</div>
+		<div style="width: 25%;flex: 0 0 auto;font-family: serif;padding-right: 1.5rem;">
+			<span>Phone:</span>
+		</div>
+		<div style="width: 25%;flex: 0 0 auto;font-family: serif;padding-right: 1.5rem;">
+			<span>@Model.ApplicationUser.PhoneNumber</span>
+		</div>
+	</div>
+	<hr>
+	<div style="width:100%;display: flex;">
+		<div style="width: 25%;flex: 0 0 auto;font-family: serif;">
+			<span>Email:</span>
+		</div>
+		<div style="width: 25%;flex: 0 0 auto;font-family: serif;">
+			<span>@Model.ApplicationUser.Email</span>
+		</div>
+	</div>
+	<hr>
+	<br>
+	<div style="background-color:#FFC107;text-align:center;font-family: cursive;">
+		Product Information
+	</div>
+	<table style="width: 100%;border-collapse: collapse; border-spacing: 0; border: 1px solid #ddd;">
+		<tr>
+			<th style="text-align: left;padding: 16px;padding-top: 12px; padding-bottom: 12px;background-color: #04AA6D;color: white;">Product Name</th>
+			<th style="text-align: left;padding: 16px;padding-top: 12px; padding-bottom: 12px;background-color: #04AA6D;color: white;">Quantity</th>
+			<th style="text-align: left;padding: 16px;padding-top: 12px; padding-bottom: 12px;background-color: #04AA6D;color: white;">Unit Price</th>
+			<th style="text-align: left;padding: 16px;padding-top: 12px; padding-bottom: 12px;background-color: #04AA6D;color: white;">Total Price</th>
+	  </tr>
+		@{
+			var orderTotal = 0.0;
+		}
+		  @foreach (var item in Model.SalesItems)
+			{
+			<tr>
+				<td style="text-align: left;padding: 16px;">@item.Product_Name</td>
+				<td style="text-align: left;padding: 16px;">@item.tempQty</td>
+				<td style="text-align: left;padding: 16px;">@item.Product_Price</td>
+				<td style="text-align: left;padding: 16px;">@(item.tempQty * item.Product_Price)</td>
+			</tr>
+				orderTotal += item.Product_Price * item.tempQty;
+			}
+	  <tr>
+	  	<td colspan="3">
+	  		<div style="color:red;float: right;">Total Bill</div>
+	  	</td>
+		  @if (Model.TempPrice == 0)
+		  {
+				<td style="color: red;">@orderTotal</td>
+		  }
+		  else{
+				<td style="color: red;">@Model.TempPrice</td>
+		  }
+	  	
+	  </tr>
+	</table>
+	<div>
+		<input id="generate_report" type="submit" class="btn btn-primary mt-2" value="Print" />
+	</div>
+</div>
+
+
+@section Scripts{
+	<script type="text/javascript">
+		$('#generate_report').click(function(){
+			var htmlData = $('#cus_invoice_report').html();
+
+			htmlData = htmlData.replace(/</g,"startTag").replace(/>/g,"endTag");
+			//window.location = window.location.origin + '/OrderList/GenerateInvoice?html=' + htmlData;
+			$.ajax({
+				url:"/Sales/GenerateInvoice",
+				type:"POST",
+				data:{
+					html:htmlData,
+				},
+				success:function(res){
+					console.log(res);
+				},
+				error:function(err){
+					console.log(err);
+				}
+			})
+		})
+		
+	</script>
+}

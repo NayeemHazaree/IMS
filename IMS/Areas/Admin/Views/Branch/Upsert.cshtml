@@ -1,0 +1,60 @@
+﻿@model IMS.Models.Models.Branch
+
+@{
+    var title = "Add Branch";
+}
+
+<form method="post" asp-action="Upsert">
+    @if (Model.BranchId != Guid.Empty)
+    {
+        title = "Edit Brand";
+        <input asp-for="BranchId" hidden />
+    }
+
+    <div class="border p-3" style="margin-top:65px;">
+        <div class="row form-group">
+            <h2 class="text-info">@title</h2>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-8">
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="BranchName"></label>
+                    </div>
+                    <div class="col-8">
+                        <input asp-for="BranchName" class="form-control" />
+                        <span asp-validation-for="BranchName"></span>
+                    </div>
+                </div>
+                <div class="form-group row mt-2">
+                    <div class="col-4">
+                        <label asp-for="BranchLoc"></label>
+                    </div>
+                    <div class="col-8">
+                        <input asp-for="BranchLoc" class="form-control" />
+                        <span asp-validation-for="BranchLoc"></span>
+                    </div>
+                </div>
+                <div class="form-group row pt-2">
+                    <div class="col-8 offset-4 row">
+                        <div class="col-4">
+                            @if (Model.BranchId == Guid.Empty)
+                            {
+                                <input type="submit" class="btn btn-info w-100" value="Create" />
+                            }
+                            else
+                            {
+                                <input type="submit" class="btn btn-info w-100" value="Update" />
+                            }
+                        </div>
+                        <div class="col-4">
+                            <a asp-action="Index" class="btn btn-success w-100">Back</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+

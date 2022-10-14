@@ -1,0 +1,138 @@
+﻿@using IMS.Utility
+@model IEnumerable<IMS.Models.Models.Product>
+@*@model IMS.Models.ViewModels.ProdCoupVM*@
+
+<link rel="stylesheet" href="~/css/CartUI.css" asp-append-version="true" />
+
+@if(Model.Count() > 0)
+{
+    <div class="card">
+    <div class="row">
+        <div class="col-md-8 cart">
+            <div class="title">
+                <div class="row">
+                    <div class="col"><h4><b>Shopping Cart</b></h4></div>
+                    <div class="col align-self-center text-right text-muted">Items: @Model.Count()</div>
+                </div>
+            </div>
+            @{
+                var orderTotal = 0.0;
+            }
+            @foreach (var item in Model)
+            {
+                <div class="row border-top border-bottom">
+                    <div class="row main align-items-center">
+                        <input asp-for="@item.Product_Id" disabled hidden />
+                        <div class="col-2"><img class="img-fluid" src="@WC.p_image_path@item.ImgPath"></div>
+                        <div class="col">
+                            <div class="row">@item.Product_Name</div>
+                        </div>
+                        <div class="col">&#x09F3; @item.Product_Price </div>
+                        <div class="col">@item.tempQty</div>
+                        <div class="col">@(item.Product_Price * item.tempQty)</div>
+                        <div class="col">
+                            <a class="btn" asp-action="Delete" asp-route-id="@item.Product_Id"> 
+                                <i class="fa-sharp fa-solid fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                orderTotal += item.Product_Price * item.tempQty;
+            }
+            <div class="back-to-shop"><a asp-action="Index" asp-controller="AllProducts">&leftarrow;</a><span class="text-muted">Back to shop</span></div>
+        </div>
+        <div class="col-md-4 summary">
+            <div><h5><b>Summary</b></h5></div>
+            <hr>
+            <div class="row">
+                <div class="col" style="padding-left:0;">TOTAL PRICE</div>
+                <div class="col text-right">&#x09F3; @orderTotal</div>
+            </div>
+            <br />
+            <form>
+                <p>SHIPPING</p>
+                <select>
+                    <option class="text-muted">Standard-Delivery- &#x09F3; 55.00</option>
+                </select>
+                <p>GIVE CODE</p>
+                <div class="row">
+                    <div class="col-md-10">
+                            <input id="coupon" placeholder="Enter your code">
+                    </div>
+                    <div class="col-md-2">
+                            <i id="addCpn" class="fa-sharp fa-solid fa-circle-check" onclick="addCoupon()" style="font-size: 30px;margin-top: 5px;cursor: pointer;"></i>
+                    </div>
+                </div>
+                
+            </form>
+            <div class="row" style="border-top: 1px solid rgba(0,0,0,.1); padding: 2vh 0;">
+                
+                <div class="col">SUB TOTAL</div>
+                <div id="total" class="col text-right">&#x09F3; @(orderTotal + 55.00)
+                </div>
+                <button id="removeCoup" class="text-danger form-control" style="display:none;" onclick="removeCoup()">Remove coupon</button>
+                <input id="ord_ttl" disabled hidden value="@(orderTotal + 55.00)"/>
+                <input id="original_price" disabled hidden value="@(orderTotal + 55.00)"/>
+            </div>
+            <form method="post">
+                    <button asp-action="Checkout" class="checkOutBtn">CHECKOUT</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+}
+else{
+    <p class="text-center text-white bg-danger mt-3">No items added yet!</p>
+}
+
+@section Scripts{
+    <script type="text/javascript">
+
+        function addCoupon(){
+            var couponCode = $("#coupon").val();
+            var totalAmnt = $("#ord_ttl").val();
+            $.ajax({
+                url: "/Sales/Coupon",
+                type: "GET",
+                data: {
+                    ttlPrice: totalAmnt,
+                    coupCode: couponCode,
+                },
+                success:function(res){
+                    if(res.success == true){
+                        $("#ord_ttl").val(res.afterCouponAdded);
+                        $("#total").html("&#x09F3;" + res.afterCouponAdded);
+                        $("#removeCoup").css("display", "block");
+                        $("#addCpn").css("display", "none");
+                        $("#coupon").prop('disabled', true);
+                    }
+                    else if(res.message == "No coupon"){
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: "Please Insert a coupon code!"
+                        });
+                    }
+                    else{
+                         Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: "The coupon dosen't Exists!"
+                        });
+                    }
+                },
+            });
+        }
+        
+        function removeCoup(){
+            var original = $("#original_price").val();
+            $("#ord_ttl").val(original);
+            $("#total").html("&#x09F3;" + original);
+            $("#addCpn").css("display", "block");
+            $("#removeCoup").css("display", "none");
+            $("#coupon").prop('disabled', false);
+        }
+
+    </script>
+}

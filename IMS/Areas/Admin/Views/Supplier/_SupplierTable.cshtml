@@ -1,0 +1,92 @@
+﻿@model IEnumerable<IMS.Models.Models.Supplier>
+
+<div class="border p-3" style="margin-top:65px;">
+    <div class="row">
+        <div class="col-6">
+            <h2>Supplier List</h2>
+        </div>
+        <div class="col-6">
+            <a class="btn btn-primary" id="create_Supplier" onclick="upsertSupp(null)">Add New Supplier</a>
+        </div>
+    </div>
+    <br />
+    <hr />
+    @if (Model.Count() > 0)
+    {
+        <table class="table table-responsive table-hover table-bordered table-striped table-dark" style="text-align:center;">
+            <thead>
+                <tr>
+                    <th scope="col">Serial No</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Store Name</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var supplier in Model)
+                {
+                    @if (supplier.Status == true)
+                    {
+                        <tr class="table-success">
+                            <td></td>
+                            <td>@supplier.SupplerName</td>
+                            <td>@supplier.SupplierEmail</td>
+                            <td>@supplier.SupplierPhone</td>
+                            <td>
+                                <input type="checkbox" checked disabled>
+                            </td>
+                            
+                            <td>@supplier.SupplierStoreName</td>
+                            <td>@supplier.SupplierAddress</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <a class="btn btn-secondary" id="@supplier.SupplierId" onclick="upsertSupp(this.id);">Edit</a>
+                                    </div>
+                                    <div class="col-6">
+                                        <a class="btn btn-danger" id="@supplier.SupplierId" onclick="DeleteSupplier(this.id)">Delete</a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr class="table-danger">
+                            <td></td>
+                            <td>@supplier.SupplerName</td>
+                            <td>@supplier.SupplierEmail</td>
+                            <td>@supplier.SupplierPhone</td>
+                            <td>
+                                <input type="checkbox" disabled>
+                            </td>
+
+                            <td>@supplier.SupplierStoreName</td>
+                            <td>@supplier.SupplierAddress</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <a class="btn btn-secondary" id="@supplier.SupplierId" onclick="upsertSupp(this.id);">Edit</a>
+                                    </div>
+                                    <div class="col-6">
+                                        <a class="btn btn-danger" id="@supplier.SupplierId" onclick="DeleteSupplier(this.id)">Delete</a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No Suppliers added yet!</p>
+    }
+</div>
+
+<script src="/js/serialize_table.js"></script>

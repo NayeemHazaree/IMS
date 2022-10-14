@@ -1,0 +1,207 @@
+﻿@model IMS.Models.Models.Supplier
+
+<!-- Modal -->
+<div class="modal fade" id="UpsertSupplier" tabindex="-1" aria-labelledby="UpsertSupplierLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="UpsertSupplierLabel"></h5>
+                <button type="button" onclick="suppCloseModal()"oncli class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="SupplierAdd">
+                <div class="modal-body">
+                    <div class="form-floating">
+                        
+                    </div>
+                    <input id="suppId" asp-for="SupplierId" class="form-control" hidden />
+                                       
+                    <div class="form-floating mt-2">
+                        <input id="suppName" asp-for="SupplerName" class="form-control" autocomplete="off" aria-required="true" />
+                        <label asp-for="SupplerName"></label>
+                        <span asp-validation-for="SupplerName" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mt-2">
+                        <input id="suppEmail" asp-for="SupplierEmail" class="form-control" autocomplete="off" aria-required="true" />
+                        <label asp-for="SupplierEmail"></label>
+                        <span asp-validation-for="SupplierEmail" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mt-2">
+                        <input id="suppPhn" asp-for="SupplierPhone" class="form-control" autocomplete="off" aria-required="true" />
+                        <label asp-for="SupplierPhone"></label>
+                        <span asp-validation-for="SupplierPhone" class="text-danger"></span>
+                    </div>
+                     <div class="mt-2" id="suppSts" style="display:none;">
+                        <label asp-for="Status"></label> <br />
+                        <input id="suppStats" asp-for="Status" type="checkbox" />
+                    </div>
+                     <div class="form-floating mt-2">
+                        <input id="suppAddr" asp-for="SupplierAddress" class="form-control" autocomplete="off" aria-required="true" />
+                        <label asp-for="SupplierAddress"></label>
+                        <span asp-validation-for="SupplierAddress" class="text-danger"></span>
+                    </div>
+                     <div class="form-floating mt-2">
+                        <input id="suppStoreName" asp-for="SupplierStoreName" class="form-control" autocomplete="off" aria-required="true" />
+                        <label asp-for="SupplierStoreName"></label>
+                        <span asp-validation-for="SupplierStoreName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="suppCloseModal()" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="supplier_upsert_btn" onclick="Save_Entry()" class="btn btn-primary"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="supplierTable">
+
+</div>
+
+
+@section Scripts{
+    <script src="/js/serialize_table.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            supplierTable();
+        }); //end ready function
+
+        //get supplierTable
+        function supplierTable(){
+            $.ajax({
+                url: "/Admin/Supplier/GetSupplierTable",
+                type:"GET",
+                success:function(res){
+                    //alert(res);
+                    $('#supplierTable').html(res);
+                },
+                error:function(err){
+                    console.log(err);
+                }
+            });
+        }
+
+        //Upsert Modal view
+        function upsertSupp(id){
+            var data;
+            if(id == null){
+                data = null;
+            }
+            else{
+                data = id;
+            }
+
+            $.ajax({
+                url: "/Admin/Supplier/Upsert",
+                type: "GET",
+                data:{
+                    id:id,
+                },
+                success: function (res) {
+                    if (res.message == "Create Mode"){
+                        $('#UpsertSupplierLabel').html('Create Supplier');
+                        $('#supplier_upsert_btn').html('Create');
+                        $('#UpsertSupplier').modal('show');
+                    }
+                    if (res.message == "Edit Mode"){
+                        $('#UpsertSupplierLabel').html('Edit Supplier');
+                        $('#supplier_upsert_btn').html('Update');
+                        $('#suppId').val(res.data.supplierId);
+                        $('#suppName').val(res.data.supplerName);
+                        $('#suppEmail').val(res.data.supplierEmail);
+                        $('#suppAddr').val(res.data.supplierAddress);
+                        $('#suppPhn').val(res.data.supplierPhone);
+                        $('#suppStoreName').val(res.data.supplierStoreName);
+                        if (res.data.status == true) {
+                            $('#suppStats').prop('checked', true);
+                        }
+                        else{
+                            $('#suppStats').prop('checked', false);
+                        }
+                        $('#suppSts').css('display', 'block');
+                        $('#UpsertSupplier').modal('show');
+                    }
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        }
+
+        //Upsert Save Data
+        function Save_Entry(){
+            var data = new FormData();
+            var formData = $('#SupplierAdd').serializeArray();
+            $.each(formData, function (key, input) {
+                data.append(input.name, input.value);
+            });
+
+            $.ajax({
+                url: "/Admin/Supplier/Upsert",
+                type: "POST",
+                data: data,
+                processData: false,
+                cache: false,
+                contentType: false,
+                success: function (res) {
+                    supplierTable();
+                    $('#UpsertSupplier').modal('hide');
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        }
+
+        //Delete Supplier
+        function DeleteSupplier(id){
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    //Swal.fire(
+                    //    'Deleted!',
+                    //    'Your file has been deleted.',
+                    //    'success'
+                    //)
+                    $.ajax({
+                        url: "/Admin/Supplier/Delete/",
+                        type: "POST",
+                        data: {
+                            id: id,
+                        },
+                        success: function (res) {
+                            if(res.success == true){
+                                supplierTable();
+                            }
+                        },
+                        error: function (err) {
+
+                        }
+                    })
+                }
+            })
+        }
+
+        //close Modal
+        function suppCloseModal(){
+            $('#UpsertSupplierLabel').html('');
+            $('#supplier_upsert_btn').html('');
+            $('#suppId').val('');
+            $('#suppName').val('');
+            $('#suppEmail').val('');
+            $('#suppEmail').val('');
+            $('#suppAddr').val('');
+            $('#suppPhn').val('');
+            $('#suppStoreName').val('');
+            $('#suppStats').prop('checked', false);
+        }
+    </script>
+}
