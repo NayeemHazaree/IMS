@@ -54,11 +54,11 @@ namespace IMS.Areas.Admin.Controllers
                 Text = i.Product_Name,
                 Value = i.Product_Id.ToString()
             });
-            //var branchName = _db.Branch.Select(i => new SelectListItem
-            //{
-            //    Text = i.BranchName,
-            //    Value = i.BranchId.ToString()
-            //});
+            var branchName = _db.Branch.Select(i => new SelectListItem
+            {
+                Text = i.BranchName,
+                Value = i.BranchId.ToString()
+            });
 
             var AvailableStores = storesName.Where(x => x.Selected == true);
             storesName = AvailableStores;
@@ -66,7 +66,7 @@ namespace IMS.Areas.Admin.Controllers
             {
                 Stores = storesName,
                 Products = prodName,
-                //Branch = branchName
+                Branch = branchName
             };
             return View(orderList);
         }
@@ -80,7 +80,7 @@ namespace IMS.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("SaveOrder")]
-        public async Task<IActionResult> SaveOrder(Guid storeId, Guid prodId, int qty)
+        public async Task<IActionResult> SaveOrder(Guid branchId, Guid storeId, Guid prodId, int qty)
         {
             List<Order> orders = new List<Order>();
 
@@ -95,9 +95,15 @@ namespace IMS.Areas.Admin.Controllers
             {
                 orders.Remove(delItem);
             }
-
+            
             orders.Add(new Order { StoreId = storeId, ProductId = prodId, Quantity = qty });
             HttpContext.Session.Set(WC.OrderCart, orders);
+
+            if (branchId != Guid.Empty)
+            {
+                HttpContext.Session.SetString("BranchId", branchId.ToString());
+            }
+
             var countObj = HttpContext.Session.Get<IEnumerable<Order>>(WC.OrderCart).Count();
             var Products = await _db.Product.ToListAsync();
             List<Product> ProdItem = new();
@@ -130,28 +136,136 @@ namespace IMS.Areas.Admin.Controllers
                 orders = HttpContext.Session.Get<List<OrderList>>(WC.OrderCart);
             }
             var Products = await _db.Product.ToListAsync();
+            var branchWiseProd = await _db.BranchProducts.ToListAsync();
             string StoreEmail = "";
             var invoice_with_Number = new Random().Next(1000, 9999).ToString();
             var invoice_with_String = WC.GenerateRandomString();
             var invoice = invoice_with_String + invoice_with_Number;
-            foreach (var prod_Item in orders)
+            var BranchID = HttpContext.Session.GetString("BranchId");
+            var dateTime = DateTime.Now.ToShortDateString();
+            #region DK
+            //foreach (var prod_Item in orders)
+            //{
+            //    foreach (var RProd in Products)
+            //    {
+            //        if (prod_Item.ProductId == RProd.Product_Id)
+            //        {
+            //            if(BranchID != null)
+            //            {
+            //                if (BranchID.Count() > 0)
+            //                {
+            //                    if(branchWiseProd.Count() == 0)
+            //                    {
+            //                        BranchProducts branchProducts = new()
+            //                        {
+            //                            BranchId = Guid.Parse(BranchID),
+            //                            ProductId = RProd.Product_Id,
+            //                            StoreId = await _db.Suppliers.Where(x => x.SupplierId == prod_Item.StoreId)
+            //                                        .Select(x => x.SupplierId).FirstOrDefaultAsync(),
+            //                            ResponsiblePerson = Guid.Parse(responsible_User.Id),
+            //                            Quantity = prod_Item.Quantity,
+            //                            OrderDate = Convert.ToDateTime(dateTime)
+            //                        };
+            //                        await _db.BranchProducts.AddAsync(branchProducts);
+            //                    }
+            //                    else
+            //                    {
+            //                        foreach (var brProd in branchWiseProd)
+            //                        {
+            //                            if (RProd.Product_Id == brProd.ProductId)
+            //                            {
+            //                                brProd.Quantity = brProd.Quantity + prod_Item.Quantity;
+            //                                _db.BranchProducts.Update(brProd);
+            //                            }
+            //                            else
+            //                            {
+            //                                brProd.BranchId = Guid.Parse(BranchID);
+            //                                brProd.ProductId = RProd.Product_Id;
+            //                                brProd.StoreId = await _db.Suppliers.Where(x => x.SupplierId == prod_Item.StoreId)
+            //                                    .Select(x => x.SupplierId).FirstOrDefaultAsync();
+            //                                brProd.ResponsiblePerson = Guid.Parse(responsible_User.Id);
+            //                                brProd.Quantity = prod_Item.Quantity;
+            //                                brProd.OrderDate = Convert.ToDateTime(dateTime);
+            //                                await _db.BranchProducts.AddAsync(brProd);
+            //                            }
+            //                        }
+            //                    }
+            //                }
+            //            }
+            //            else
+            //            {
+            //                //RProd.tempQty = prod_Item.Quantity;
+            //                RProd.Quantity = RProd.Quantity + prod_Item.Quantity;
+            //                _db.Product.Update(RProd);
+            //            }
+            //        }
+            //    }
+            //    StoreEmail = await _db.Suppliers.Where(x => x.SupplierId == prod_Item.StoreId).Select(x => x.SupplierEmail).FirstOrDefaultAsync();
+            //    OrderList orderList = new();
+            //    prod_Item.OrderDate = Convert.ToDateTime(dateTime);
+            //    prod_Item.Responsible_User = responsible_User.Id;
+            //    prod_Item.Invoice = invoice;
+            //    await _db.OrderLists.AddAsync(prod_Item);
+            //}
+            #endregion
+            foreach (var orderItem in orders)
             {
-                foreach (var RProd in Products)
+                StoreEmail = await _db.Suppliers.Where(x => x.SupplierId == orderItem.StoreId).Select(x => x.SupplierEmail).FirstOrDefaultAsync();
+                
+                //check if the product added to the branch or main office
+                if (BranchID != null)
                 {
-                    if (prod_Item.ProductId == RProd.Product_Id)
+                    var existProd = await _db.BranchProducts.FirstOrDefaultAsync(x => x.ProductId == orderItem.ProductId);
+                    if (existProd != null)
                     {
-                        //RProd.tempQty = prod_Item.Quantity;
-                        RProd.Quantity = RProd.Quantity + prod_Item.Quantity;
-                        _db.Product.Update(RProd);
+                        //upadting the branch product
+                        existProd.Quantity = existProd.Quantity + orderItem.Quantity;
+                        _db.BranchProducts.Update(existProd);
+                    }
+                    else
+                    {
+                        //add product to the branch
+                        BranchProducts branchProducts = new()
+                        {
+                            BranchId = Guid.Parse(BranchID),
+                            ProductId = orderItem.ProductId,
+                            StoreId = await _db.Suppliers.Where(x => x.SupplierId == orderItem.StoreId)
+                                                .Select(x => x.SupplierId).FirstOrDefaultAsync(),
+                            ResponsiblePerson = Guid.Parse(responsible_User.Id),
+                            Quantity = orderItem.Quantity,
+                            OrderDate = Convert.ToDateTime(dateTime)
+                        };
+                        await _db.BranchProducts.AddAsync(branchProducts);
                     }
                 }
-                StoreEmail = await _db.Suppliers.Where(x => x.SupplierId == prod_Item.StoreId).Select(x => x.SupplierEmail).FirstOrDefaultAsync();
+                else
+                {
+                    //updating the real product
+                    var RealProd = await _db.Product.FirstOrDefaultAsync(x => x.Product_Id == orderItem.ProductId);
+                    if (RealProd != null)
+                    {
+                        RealProd.Quantity = RealProd.Quantity + orderItem.Quantity;
+                        _db.Product.Update(RealProd);
+                    }
+                }
+
+                //add ordered product to the orderList Table
                 OrderList orderList = new();
-                var dateTime = DateTime.Now.ToShortDateString();
-                prod_Item.OrderDate = Convert.ToDateTime(dateTime);
-                prod_Item.Responsible_User = responsible_User.Id;
-                prod_Item.Invoice = invoice;
-                await _db.OrderLists.AddAsync(prod_Item);
+                if (BranchID != null)
+                {
+                    orderList.BranchId = Guid.Parse(BranchID);
+                }
+                else
+                {
+                    orderList.BranchId = Guid.Empty;
+                }
+                orderList.StoreId = orderItem.StoreId;
+                orderList.ProductId = orderItem.ProductId;
+                orderList.Quantity = orderItem.Quantity;
+                orderList.OrderDate = Convert.ToDateTime(dateTime);
+                orderList.Responsible_User = responsible_User.Id;
+                orderList.Invoice = invoice;
+                await _db.OrderLists.AddAsync(orderList);
             }
             await _db.SaveChangesAsync();
 
@@ -166,7 +280,7 @@ namespace IMS.Areas.Admin.Controllers
 
             string messageBody = string.Format(HtmlBody, prodListSb.ToString());
 
-            await _emailSender.SendEmailAsync(StoreEmail, subject, messageBody);
+            //await _emailSender.SendEmailAsync(StoreEmail, subject, messageBody);
             //HttpContext.Session.Remove(WC.OrderCart);
             var SupplierInfo = await _db.Suppliers.Where(x => x.SupplierEmail == StoreEmail).FirstOrDefaultAsync();
             List<Product> ProdItem = new();
@@ -190,7 +304,7 @@ namespace IMS.Areas.Admin.Controllers
                 Date = Convert.ToDateTime(todatyDate)
             };
             HttpContext.Session.Remove(WC.OrderCart);
-
+            HttpContext.Session.Remove("BranchId");
             return View(orderInvoiceVM);
         }
 

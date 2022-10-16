@@ -32,6 +32,7 @@ namespace IMS.DataAccess.Data
         public DbSet<Sales> Sales { get; set; }
         public DbSet<CouponCodes> CouponCodes { get; set; }
         public DbSet<Branch> Branch { get; set; }
+        public DbSet<BranchProducts> BranchProducts { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

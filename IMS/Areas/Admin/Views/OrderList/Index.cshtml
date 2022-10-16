@@ -34,20 +34,21 @@
         <div class="col-md-12">
             <div class="row">
                 <div class="col-md-5">
+                    <strong>Select Branch</strong>
+                    <select id="select_branch" asp-for="BranchId" asp-items="@Model.Branch" class="form-control">
+                        <option disabled selected>--Select Branch--</option>
+                    </select>
+                    <br />
                     <strong>Select Store</strong>
                     <select id="select_store" onchange="openProd()" asp-for="StoreId" asp-items="@Model.Stores" class="form-control">
                         <option disabled selected>--Select Store--</option>
                     </select>
                     <br />
-                    @*<strong>Select Branch</strong>
-                    <select asp-for="BranchId" asp-items="@Model.Branch" class="form-control">
-                        <option disabled selected>--Select Branch--</option>
-                    </select>
-                    <br />*@
                     <strong>Select Product</strong>
                     <select id="select_prod" disabled asp-for="ProductId" asp-items="@Model.Products" onchange="orderProduct()" class="form-control">
                         <option disabled selected>--Select Product--</option>
                     </select>
+                    <br />
                     <div id="orderView">
                     </div>
                 </div>
@@ -118,12 +119,14 @@
             var storeID = $('#select_store').val();
             var prodID = $('#select_prod').val();
             var tempQty = $('#qty').val();
+            var branchID = $('#select_branch').val();
             if (storeID != null && prodID != null && tempQty != null) {
                 $('#save_Order').attr('disabled', false);
                 $.ajax({
                     url: "/Admin/OrderList/SaveOrder",
                     type: "POST",
                     data: {
+                        branchId: branchID,
                         storeId: storeID,
                         prodId: prodID,
                         qty: tempQty,
@@ -150,6 +153,7 @@
                         }
                         $('#select_prod').val('--Select Product--');
                         $('#qty').val(0);
+                        $('#select_branch').attr('disabled', true);
                     },
                     error: function (err) {
                         console.log(err);

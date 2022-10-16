@@ -16,7 +16,7 @@ namespace IMS.Models.Models
         public Guid Id { get; set; }
         public Guid StoreId { get; set; }
         public Guid ProductId { get; set; }
-        //public Guid BranchId { get; set; }
+        public Guid BranchId { get; set; }
         public string? Invoice { get; set; }
         public int Quantity { get; set; }
         [DataType(DataType.Date)]
