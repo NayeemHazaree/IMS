@@ -9,8 +9,10 @@ namespace IMS.Models.ViewModels
 {
     public class OrderInvoiceVM
     {
+        
         public Supplier? Supplier { get; set; }
         public IEnumerable<Product>? OrderList { get; set; }
-        public DateOnly Date { get; set; }
+        public DateTime Date { get; set; }
+        public string? Invoice { get; set; }
     }
 }

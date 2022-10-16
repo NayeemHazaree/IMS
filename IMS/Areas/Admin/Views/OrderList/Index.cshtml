@@ -39,6 +39,11 @@
                         <option disabled selected>--Select Store--</option>
                     </select>
                     <br />
+                    @*<strong>Select Branch</strong>
+                    <select asp-for="BranchId" asp-items="@Model.Branch" class="form-control">
+                        <option disabled selected>--Select Branch--</option>
+                    </select>
+                    <br />*@
                     <strong>Select Product</strong>
                     <select id="select_prod" disabled asp-for="ProductId" asp-items="@Model.Products" onchange="orderProduct()" class="form-control">
                         <option disabled selected>--Select Product--</option>

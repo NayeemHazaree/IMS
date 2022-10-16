@@ -19,6 +19,7 @@ namespace IMS.Models.Models
         public string? Responsible_User { get; set; }
         public bool IsCoupon { get; set; }
         public string? CoupnName { get; set; }
+        public string? Invoice { get; set; }
         [NotMapped]
         public string? Product_Name { get; set; }
         

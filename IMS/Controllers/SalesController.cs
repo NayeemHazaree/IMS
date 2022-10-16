@@ -122,6 +122,9 @@ namespace IMS.Controllers
             }
             var Products = await _db.Product.ToListAsync();
 
+            var invoice_with_Number = new Random().Next(1000, 9999).ToString();
+            var invoice_with_String = WC.GenerateRandomString();
+            var invoice = invoice_with_String + invoice_with_Number;
             var ccName = HttpContext.Session.GetString("couponName");
             foreach (var prod_Item in ShoppingCartList)
             {
@@ -145,12 +148,19 @@ namespace IMS.Controllers
                 var dateTime = DateTime.Now.ToShortDateString();
                 prod_Item.Sale_Date = Convert.ToDateTime(dateTime);
                 prod_Item.Responsible_User = responsible_User.Id;
-                prod_Item.IsCoupon = false;
-                prod_Item.CoupnName = null;
-                if (ccName.Count() > 1)
+                prod_Item.Invoice = invoice;
+                if(ccName != null)
                 {
-                    prod_Item.IsCoupon = true;
-                    prod_Item.CoupnName = ccName;
+                    if (ccName.Count() > 1)
+                    {
+                        prod_Item.IsCoupon = true;
+                        prod_Item.CoupnName = ccName;
+                    }
+                }
+                else
+                {
+                    prod_Item.IsCoupon = false;
+                    prod_Item.CoupnName = null;
                 }
                 await _db.Sales.AddAsync(prod_Item);
             }

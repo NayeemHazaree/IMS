@@ -16,6 +16,8 @@ namespace IMS.Models.Models
         public Guid Id { get; set; }
         public Guid StoreId { get; set; }
         public Guid ProductId { get; set; }
+        //public Guid BranchId { get; set; }
+        public string? Invoice { get; set; }
         public int Quantity { get; set; }
         [DataType(DataType.Date)]
         public DateTime OrderDate { get; set; }
@@ -30,5 +32,7 @@ namespace IMS.Models.Models
         public IEnumerable<SelectListItem>? Stores { get; set; }
         [NotMapped]
         public IEnumerable<SelectListItem>? Products { get; set; }
+        [NotMapped]
+        public IEnumerable<SelectListItem>? Branch { get; set; }
     }
 }

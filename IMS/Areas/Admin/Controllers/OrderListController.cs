@@ -20,6 +20,7 @@ using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using SelectPdf;
 using Microsoft.CodeAnalysis.RulesetToEditorconfig;
 using System.Drawing;
+using System.Security.Cryptography;
 
 namespace IMS.Areas.Admin.Controllers
 {
@@ -53,13 +54,19 @@ namespace IMS.Areas.Admin.Controllers
                 Text = i.Product_Name,
                 Value = i.Product_Id.ToString()
             });
+            //var branchName = _db.Branch.Select(i => new SelectListItem
+            //{
+            //    Text = i.BranchName,
+            //    Value = i.BranchId.ToString()
+            //});
 
             var AvailableStores = storesName.Where(x => x.Selected == true);
             storesName = AvailableStores;
             OrderList orderList = new()
             {
                 Stores = storesName,
-                Products = prodName
+                Products = prodName,
+                //Branch = branchName
             };
             return View(orderList);
         }
@@ -124,6 +131,9 @@ namespace IMS.Areas.Admin.Controllers
             }
             var Products = await _db.Product.ToListAsync();
             string StoreEmail = "";
+            var invoice_with_Number = new Random().Next(1000, 9999).ToString();
+            var invoice_with_String = WC.GenerateRandomString();
+            var invoice = invoice_with_String + invoice_with_Number;
             foreach (var prod_Item in orders)
             {
                 foreach (var RProd in Products)
@@ -140,6 +150,7 @@ namespace IMS.Areas.Admin.Controllers
                 var dateTime = DateTime.Now.ToShortDateString();
                 prod_Item.OrderDate = Convert.ToDateTime(dateTime);
                 prod_Item.Responsible_User = responsible_User.Id;
+                prod_Item.Invoice = invoice;
                 await _db.OrderLists.AddAsync(prod_Item);
             }
             await _db.SaveChangesAsync();
@@ -170,10 +181,13 @@ namespace IMS.Areas.Admin.Controllers
                     }
                 }
             }
+            var todatyDate = DateTime.Now.ToShortDateString();
             OrderInvoiceVM orderInvoiceVM = new()
             {
                 Supplier = SupplierInfo,
-                OrderList = ProdItem
+                OrderList = ProdItem,
+                Invoice = invoice,
+                Date = Convert.ToDateTime(todatyDate)
             };
             HttpContext.Session.Remove(WC.OrderCart);
 
