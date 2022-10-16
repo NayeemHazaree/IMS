@@ -280,7 +280,7 @@ namespace IMS.Areas.Admin.Controllers
 
             string messageBody = string.Format(HtmlBody, prodListSb.ToString());
 
-            //await _emailSender.SendEmailAsync(StoreEmail, subject, messageBody);
+            await _emailSender.SendEmailAsync(StoreEmail, subject, messageBody);
             //HttpContext.Session.Remove(WC.OrderCart);
             var SupplierInfo = await _db.Suppliers.Where(x => x.SupplierEmail == StoreEmail).FirstOrDefaultAsync();
             List<Product> ProdItem = new();
