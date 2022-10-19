@@ -1,5 +1,6 @@
 ﻿using IMS.DataAccess.Data;
 using IMS.Models.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace IMS.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("Admin/Branch")]
+    [Authorize(Policy = "AccessChecker")]
     public class BranchController : Controller
     {
         private readonly ApplicationDbContext _db;

@@ -10,24 +10,25 @@ using System.Threading.Tasks;
 
 namespace IMS.Models.Models
 {
-    public class OrderList
+    public class OrderHeader
     {
         [Key]
         public Guid Id { get; set; }
-        public Guid StoreId { get; set; }
-        public Guid ProductId { get; set; }
+        public string? OrderStatus { get; set; }
         public Guid BranchId { get; set; }
-        public string? Invoice { get; set; }
-        public int Quantity { get; set; }
-        [DataType(DataType.Date)]
-        public DateTime OrderDate { get; set; }
+        public Guid StoreId { get; set; }
+        [NotMapped]
+        public Guid ProductId { get; set; }
         public string? Responsible_User { get; set; }
+        public DateTime OrderDate { get; set; }
         [NotMapped]
         public string? Responsible_Persone_Name { get; set; }
         [NotMapped]
         public string? Product_Name { get; set; }
         [NotMapped]
         public string? Store_Name { get; set; }
+        [NotMapped]
+        public string? Branch_Name { get; set; }
         [NotMapped]
         public IEnumerable<SelectListItem>? Stores { get; set; }
         [NotMapped]

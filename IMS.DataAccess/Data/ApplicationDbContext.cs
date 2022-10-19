@@ -28,16 +28,17 @@ namespace IMS.DataAccess.Data
         public DbSet<UserPrivilege> UserPrivileges { get; set; }
         public DbSet<Role> Role { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
-        public DbSet<OrderList> OrderLists { get; set; }
+        public DbSet<OrderHeader> OrderHeaders { get; set; }
         public DbSet<Sales> Sales { get; set; }
         public DbSet<CouponCodes> CouponCodes { get; set; }
         public DbSet<Branch> Branch { get; set; }
         public DbSet<BranchProducts> BranchProducts { get; set; }
+        public DbSet<OrderDetails> OrderDetails { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<OrderList>().
-                Property(x => x.OrderDate).HasColumnType("date");
+            //base.OnModelCreating(modelBuilder);
+            //modelBuilder.Entity<OrderDetails>().
+            //    Property(x => x.OrderDate).HasColumnType("date");
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Sales>().

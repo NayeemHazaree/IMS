@@ -55,8 +55,16 @@
         </div>
         <div id="SidenavBar" class="sideNavClose" style="margin-top: 50px;">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="font-size: 20px;display: block;margin-top: -25px;">
-                <li class="nav-item" style="margin-top: 10px;">
-                    <a class="dropdown-item nav-link text-dark text-center" asp-area="Admin" asp-controller="OrderList" asp-action="Index">Order Products</a>
+                @*<li class="nav-item" style="margin-top: 10px;">
+                </li>*@
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Order Section
+                    </a>
+                    <ul class="dropdown-menu navDropDownOptions" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item nav-link text-dark text-center" asp-area="Admin" asp-controller="OrderHeader" asp-action="Index">Order List</a>
+                        <a class="dropdown-item nav-link text-dark text-center" asp-area="Admin" asp-controller="OrderDetails" asp-action="Index">Send Request</a>
+                    </ul>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">

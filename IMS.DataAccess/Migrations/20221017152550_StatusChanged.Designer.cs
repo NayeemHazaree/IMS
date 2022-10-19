@@ -4,6 +4,7 @@ using IMS.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IMS.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221017152550_StatusChanged")]
+    partial class StatusChanged
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -164,7 +166,7 @@ namespace IMS.DataAccess.Migrations
                     b.ToTable("MenuList");
                 });
 
-            modelBuilder.Entity("IMS.Models.Models.OrderDetails", b =>
+            modelBuilder.Entity("IMS.Models.Models.OrderHeader", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -173,7 +175,10 @@ namespace IMS.DataAccess.Migrations
                     b.Property<string>("Invoice")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("OrderDetailsId")
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("OrderListId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("ProductId")
@@ -181,28 +186,6 @@ namespace IMS.DataAccess.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderDetailsId");
-
-                    b.ToTable("OrderDetails");
-                });
-
-            modelBuilder.Entity("IMS.Models.Models.OrderHeader", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("BranchId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("OrderStatus")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Responsible_User")
                         .HasColumnType("nvarchar(max)");
@@ -212,7 +195,23 @@ namespace IMS.DataAccess.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("OrderListId");
+
                     b.ToTable("OrderHeaders");
+                });
+
+            modelBuilder.Entity("IMS.Models.Models.OrderList", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("OrderStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrderLists");
                 });
 
             modelBuilder.Entity("IMS.Models.Models.Product", b =>
@@ -585,15 +584,15 @@ namespace IMS.DataAccess.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("IMS.Models.Models.OrderDetails", b =>
+            modelBuilder.Entity("IMS.Models.Models.OrderHeader", b =>
                 {
-                    b.HasOne("IMS.Models.Models.OrderHeader", "OrderHeader")
+                    b.HasOne("IMS.Models.Models.OrderList", "OrderList")
                         .WithMany()
-                        .HasForeignKey("OrderDetailsId")
+                        .HasForeignKey("OrderListId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("OrderHeader");
+                    b.Navigation("OrderList");
                 });
 
             modelBuilder.Entity("IMS.Models.Models.Product", b =>

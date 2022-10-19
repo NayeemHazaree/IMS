@@ -15,6 +15,8 @@ namespace IMS.Models.Models
         public Guid StoreId { get; set; }
         public Guid ProductId { get; set; }
         public int Quantity { get; set; }
+        [NotMapped]
+        public string? Product_Name { get; set; }
 
     }
 }

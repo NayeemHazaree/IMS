@@ -1,9 +1,10 @@
-﻿@model IMS.Models.Models.OrderList
+﻿@model IMS.Models.Models.OrderHeader
 
 <div class="row mt-2">
     <div class="col-md-10">
         <strong>Select Quantity</strong>
-        <input asp-for="Quantity" class="form-control" onchange="openAddBtn()" id="qty" type="number" />
+        @*<input asp-for="Quantity" class="form-control" onchange="openAddBtn()" id="qty" type="number" />*@
+        <input class="form-control" onchange="openAddBtn()" id="qty" type="number" />
 
     </div>
     <div class="col-md-2">

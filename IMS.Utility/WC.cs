@@ -8,6 +8,9 @@ namespace IMS.Utility
         public static string? SessionCart = "ShoppingCartSession";
         public static string? OrderCart = "OrderListSession";
         public static string? AdminMail = "tmy0044@gmail.com";
+        public static string? Pending = "Pending";
+        public static string? Submitted = "Submitted";
+        public static string? Cancel = "Cancel";
 
         public static string GenerateRandomString()
         {
