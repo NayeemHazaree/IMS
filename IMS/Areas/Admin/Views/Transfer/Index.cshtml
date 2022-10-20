@@ -1,0 +1,156 @@
+﻿@model IMS.Models.ViewModels.TransferVM
+
+
+<style>
+    .collapsible {
+        background-color: #777;
+        color: white;
+        cursor: pointer;
+        padding: 18px;
+        width: 100%;
+        border: none;
+        text-align: left;
+        outline: none;
+        font-size: 15px;
+    }
+
+        .active, .collapsible:hover {
+            background-color: #555;
+        }
+
+    .content {
+        padding: 0 18px;
+        display: none;
+        overflow: hidden;
+        background-color: #f1f1f1;
+    }
+</style>
+<div class="border p-3" style="margin-top:65px;">
+    <div class="text-center text-primary">
+        <h2>Product Transfer</h2>
+    </div>
+    <br />
+    <hr />
+    <button type="button" class="collapsible">Head Office to Branch</button>
+    <div class="content mt-2">
+        <select id="prodID" class="form-select" multiple aria-label="multiple select example" asp-for="ProductId" asp-items="@Model.ProductList">
+            <option disabled selected style="text-align:center;">----Select Products----</option>
+        </select>
+        <p class="text-danger">*For multiple select please hold the 'ctrl' button</p>
+        <br />
+
+        <strong>Select Branch</strong>
+        <select id="brID" asp-for="BranchId" asp-items="@Model.BranchList" class="form-control">
+            <option disabled selected>--Select Branch--</option>
+        </select>
+        <br />
+        <input id="qty" class="form-control mt-2" asp-for="Quantity" />
+        <div class="row mt-2">
+            <div class="col-md-6">
+                <button onclick="transferToBranch()" class="btn btn-primary"> Transfer</button>
+            </div>
+            @*        <div class="col-md-6">
+            <button class="btn btn-info" style="float:right;">Retrive</button>
+            </div>*@
+        </div>
+    </div>
+
+    <button type="button" class="collapsible mt-5">Branch To Head Office</button>
+    <div class="content mt-2">
+        <select id="brProd" class="form-select" multiple aria-label="multiple select example" asp-for="ProductId" asp-items="@Model.ProductList">
+            <option disabled selected style="text-align:center;">----Select Products----</option>
+        </select>
+        <p class="text-danger">*For multiple select please hold the 'ctrl' button</p>
+        <br />
+
+        <strong>Select Branch</strong>
+        <select id="branch" asp-for="BranchId" asp-items="@Model.BranchList" class="form-control">
+            <option disabled selected>--Select Branch--</option>
+        </select>
+        <br />
+        <input id="brQty" class="form-control mt-2" asp-for="Quantity" />
+        <div class="row mt-2">
+            <div class="col-md-6">
+                <button onclick="transferToBranch()" class="btn btn-primary"> Transfer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        function transferToBranch(){
+            var prods = $('#prodID').val();
+            var brs = $('#brID').val();
+            var qt = $('#qty').val();
+            var isBranch = true;
+            if (prods.length == 0) {
+                prods = $('#brProd').val();
+                brs = $('#branch').val();
+                qt = $('#brQty').val();
+                isBranch = false;
+            }
+            $.ajax({
+                url: "/Admin/Transfer/TransferProd",
+                type:"POST",
+                data:{
+                    ProdVal: prods,
+                    branchID: brs,
+                    qty: qt,
+                    IsBranch: isBranch,
+                },
+                success:function(res){
+                    if(res.success == true){
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Product Transfer!!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        $('#brID').val("--Select Branch--");
+                        $('#prodID').val("----Select Products----");
+                        $('#qty').val(1);
+                        $('#brProd').val("----Select Products----");
+                        $('#branch').val("--Select Branch--");
+                        $('#brQty').val(1);
+                    }
+                    else{
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Something went wrong try again!!!'
+                        });
+                    }
+                }
+            });
+        }
+
+
+        $("#brProd").change(function () {
+            $('#prodID').val("----Select Products----");
+        });
+
+        $("#prodID").change(function () {
+            $('#brProd').val("----Select Products----");
+        });
+
+    
+
+        //collapsible section:
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+
+        for (i = 0; i < coll.length; i++) {
+            coll[i].addEventListener("click", function () {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.display === "block") {
+                    content.style.display = "none";
+                } else {
+                    content.style.display = "block";
+                }
+            });
+        }
+    </script>
+}
