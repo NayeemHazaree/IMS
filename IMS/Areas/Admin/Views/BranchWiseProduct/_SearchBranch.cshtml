@@ -1,0 +1,24 @@
+﻿@model IEnumerable<IMS.Models.Models.BranchProducts>
+
+
+<table class="table table-responsive table-hover table-bordered table-striped" style="text-align:center;">
+    <thead>
+        <tr>
+            <th scope="col">ProductId</th>
+            <th scope="col">StoreId</th>
+            <th scope="col">Responsible Person</th>
+            <th scope="col">Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ProductName</td>
+                <td>@item.StoreName</td>
+                <td>@item.ResponsiblePersonName</td>
+                <td>@item.Quantity</td>
+            </tr>
+        }
+    </tbody>
+</table>

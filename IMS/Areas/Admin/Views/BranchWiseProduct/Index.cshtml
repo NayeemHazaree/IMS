@@ -1,0 +1,42 @@
+﻿@model IMS.Models.ViewModels.BranchWiseProductVM
+
+<div class="border p-3" style="margin-top:65px;">
+    <div class="text-center text-primary">
+        <h2>Branch Wise Products</h2>
+    </div>
+    <br />
+    <hr />
+    <div class="mt-5">
+        <select id="brachID" onchange="searchProd()" class="form-select" asp-for="branchId" asp-items="@Model.branchList">
+            <option disabled selected style="text-align:center;">----Select Branch----</option>
+        </select>
+    </div>
+    <br />
+    <div id="branchWishProds">
+
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+
+        function searchProd() {
+            var brnchId = $("#brachID").val();
+            $.ajax({
+                type: 'GET',
+                url: '/Admin/BranchWiseProduct/SearchBranch/',
+                data: {
+                    id: brnchId
+                },
+                success: function (data) {
+                    $("#branchWishProds").html(data);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+                //async: true
+            });
+        }
+    </script>
+}
+
