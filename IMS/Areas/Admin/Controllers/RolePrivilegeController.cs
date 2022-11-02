@@ -11,7 +11,7 @@ namespace IMS.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("Admin/RolePrivilege")]
-    //[Authorize(Policy = "AccessChecker")]
+    [Authorize(Policy = "AccessChecker")]
     public class RolePrivilegeController : Controller
     {
         private readonly ApplicationDbContext _db;

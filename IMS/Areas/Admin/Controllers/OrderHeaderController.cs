@@ -3,8 +3,11 @@ using IMS.Models.Models;
 using IMS.Models.ViewModels;
 using IMS.Utility;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using static NuGet.Packaging.PackagingConstants;
 
 namespace IMS.Areas.Admin.Controllers
 {
@@ -13,10 +16,12 @@ namespace IMS.Areas.Admin.Controllers
     [Authorize(Policy = "AccessChecker")]
     public class OrderHeaderController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public OrderHeaderController(ApplicationDbContext db)
+        private readonly ApplicationDbContext _db; 
+        private readonly IEmailSender _emailSender;
+        public OrderHeaderController(ApplicationDbContext db, IEmailSender emailSender)
         {
             _db = db;
+            _emailSender = emailSender;
         }
 
         [Route("Index")]
@@ -77,6 +82,7 @@ namespace IMS.Areas.Admin.Controllers
             {
                 var orderHeaderEle = await _db.OrderHeaders.FirstOrDefaultAsync(x => x.Id == id);
                 var orderDtEle = _db.OrderDetails.Where(x => x.OrderDetailsId == id).ToList();
+                bool sentMail = false;
                 if(orderHeaderEle.OrderStatus != WC.Submitted && orderHeaderEle.OrderStatus != WC.Cancel)
                 {
                     orderHeaderEle.OrderStatus = WC.Submitted;
@@ -98,7 +104,26 @@ namespace IMS.Areas.Admin.Controllers
                         var brProd = await _db.BranchProducts.FirstOrDefaultAsync(x => x.ProductId == ordrEle.ProductId);
                         brProd.Quantity = brProd.Quantity + ordrEle.Quantity;
                         _db.BranchProducts.Update(brProd);
-                    }                }
+                    }
+                    if(sentMail == false)
+                    {
+                        sentMail = true;
+                    }
+                }
+                if(sentMail == true)
+                {
+                    var subject = "New Order for Products!";
+                    var StoreEmail = await _db.Suppliers.Where(x => x.SupplierId == orderHeaderEle.StoreId).Select(x => x.SupplierEmail).FirstOrDefaultAsync();
+                    string HtmlBody = "<strong>Hello there!</strong> <br />  <p><span style='font-size:17px;'>Need some products from your store! Giving the products list bellow<strong>:</strong></span><br />{0}<br /></p><strong>Address: Dhaka <br />Phone:01234567</strong> <br /><br /><br /> <strong>Kind Regards,<br /> IMS Team</strong> ";
+                    StringBuilder prodListSb = new();
+                    foreach (var item in orderDtEle)
+                    {
+                        item.Product_Name = await _db.Product.Where(x => x.Product_Id == item.ProductId).Select(x => x.Product_Name).FirstOrDefaultAsync();
+                        prodListSb.Append($" - <span style='font-size:20px;font-family: cursive;'>Name<strong>:</strong> {item.Product_Name}</span> <mark style='font-size:20px;'>(Quantity: {item.Quantity})</mark><br />");
+                    }
+                    string messageBody = string.Format(HtmlBody, prodListSb.ToString());
+                    await _emailSender.SendEmailAsync(StoreEmail, subject, messageBody);
+                }
 
                 await _db.SaveChangesAsync();
                 return Json(new { success = true });

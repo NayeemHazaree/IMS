@@ -21,6 +21,8 @@ namespace IMS.Models.Models
         public Guid ProductId { get; set; }
         public string? Invoice { get; set; }
         public int Quantity { get; set; }
+        [NotMapped]
+        public string? Product_Name { get; set; }
         //[DataType(DataType.Date)]
         //public DateTime OrderDate { get; set; }
         //public string? Responsible_User { get; set; }

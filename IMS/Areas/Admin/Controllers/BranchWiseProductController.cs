@@ -1,5 +1,6 @@
 ﻿using IMS.DataAccess.Data;
 using IMS.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ namespace IMS.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("Admin/BranchWiseProduct")]
+    [Authorize(Policy = "AccessChecker")]
     public class BranchWiseProductController : Controller
     {
         private readonly ApplicationDbContext _db;

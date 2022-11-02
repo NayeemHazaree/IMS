@@ -1,6 +1,7 @@
 ﻿using IMS.DataAccess.Data;
 using IMS.Models.Models;
 using IMS.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ namespace IMS.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("Admin/Transfer")]
+    [Authorize(Policy = "AccessChecker")]
     public class TransferController : Controller
     {
         private readonly ApplicationDbContext _db;

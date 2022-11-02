@@ -1,5 +1,6 @@
 ﻿using IMS.DataAccess.Data;
 using IMS.Models.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
@@ -9,6 +10,7 @@ namespace IMS.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("Admin/Supplier")]
+    [Authorize(Policy = "AccessChecker")]
     public class SupplierController : Controller
     {
         private readonly ApplicationDbContext _db;

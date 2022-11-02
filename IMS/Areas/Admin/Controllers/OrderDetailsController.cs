@@ -310,18 +310,21 @@ namespace IMS.Areas.Admin.Controllers
             }
             await _db.SaveChangesAsync();
 
-            var subject = "New Order for Products!";
-            string HtmlBody = "<strong>Hello there!</strong> <br />  <p><span style='font-size:17px;'>Need some products from your store! Giving the products list bellow<strong>:</strong></span><br />{0}<br /></p><strong>Address: Dhaka <br />Phone:01234567</strong> <br /><br /><br /> <strong>Kind Regards,<br /> IMS Team</strong> ";
-            StringBuilder prodListSb = new();
-            foreach (var prod in orders)
-            {
-                prod.Product_Name = await _db.Product.Where(x => x.Product_Id == prod.ProductId).Select(x => x.Product_Name).FirstOrDefaultAsync();
-                //prodListSb.Append($" - <span style='font-size:20px;font-family: cursive;'>Name<strong>:</strong> {prod.Product_Name}</span> <mark style='font-size:20px;'>(Quantity: {prod.Quantity})</mark><br />");
-            }
+            #region Sent mail moved to OrderHeader controller
+            //after an admin approved the items then sent mail!!!
+            //var subject = "New Order for Products!";
+            //string HtmlBody = "<strong>Hello there!</strong> <br />  <p><span style='font-size:17px;'>Need some products from your store! Giving the products list bellow<strong>:</strong></span><br />{0}<br /></p><strong>Address: Dhaka <br />Phone:01234567</strong> <br /><br /><br /> <strong>Kind Regards,<br /> IMS Team</strong> ";
+            //StringBuilder prodListSb = new();
+            //foreach (var prod in orders)
+            //{
+            //    prod.Product_Name = await _db.Product.Where(x => x.Product_Id == prod.ProductId).Select(x => x.Product_Name).FirstOrDefaultAsync();
+            //    //prodListSb.Append($" - <span style='font-size:20px;font-family: cursive;'>Name<strong>:</strong> {prod.Product_Name}</span> <mark style='font-size:20px;'>(Quantity: {prod.Quantity})</mark><br />");
+            //}
 
-            string messageBody = string.Format(HtmlBody, prodListSb.ToString());
+            //string messageBody = string.Format(HtmlBody, prodListSb.ToString());
 
-            //await _emailSender.SendEmailAsync(StoreEmail, subject, messageBody);
+            ////await _emailSender.SendEmailAsync(StoreEmail, subject, messageBody);
+            #endregion
             //HttpContext.Session.Remove(WC.OrderCart);
             var SupplierInfo = await _db.Suppliers.Where(x => x.SupplierEmail == StoreEmail).FirstOrDefaultAsync();
             List<Product> ProdItem = new();
